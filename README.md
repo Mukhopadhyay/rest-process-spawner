@@ -1,2 +1,8 @@
 # rest-process-spawner
-Executing lengthy functions using python Rest API and processes.
+Example scenario of executing lengthy functions using python Rest APIs and processes.
+
+## Starting the server
+```bash
+uvicorn app:app
+```
+
