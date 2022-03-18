@@ -8,6 +8,7 @@ from typing import List
 from fastapi import APIRouter, status, HTTPException, Request
 
 
+start_time = utils.get_dt()
 background_process = None
 process_history = []
 
@@ -16,9 +17,12 @@ process_history = []
 router = APIRouter()
 
 # Index route
-@router.get('/', tags=['info'])
+@router.get('/', tags=['info'], response_model=models.IndexResponse)
 def get_index():
-    return {'name': 'process-spawner'}
+    return models.IndexResponse(
+        endpoints=[r.path for r in router.routes],
+        start_time=start_time
+    )
 
 
 @router.post('/create', 
@@ -64,7 +68,17 @@ def get_all_active_processes():
 @router.get('/kill', tags=['processes'])
 def kill_the_most_recent_process():
     background_process.terminate()
-    return 'killed: ' + str(background_process.pid)
+    return 'killed:' + str(background_process.pid)
+
+@router.get('/kill_recent', tags=['processes'])
+def kill_most_recent_process():
+    try:
+        recent_process = process_history[-1]
+    except IndexError:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'No process created!')
+    else:
+        print('Deleting:', recent_process)
+        return 'killed:' + str(recent_process.pid)
 
 
 @router.get('/kill_all', tags=['processes'])
