@@ -24,6 +24,31 @@ def get_index():
         start_time=start_time
     )
 
+@router.get('/create',
+            tags=['processes'],
+            status_code=status.HTTP_201_CREATED,
+            response_model=models.CreateResponse)
+def create_with_random_val():
+    global background_process
+
+     ###############################################################
+    #       This is where the time consuming function goes        #
+    ###############################################################
+
+    background_process = multiprocessing.Process(target=utils.take_some_time)
+    background_process.start()
+    pid = background_process.pid
+
+    process_history.append(
+        models.ProcessesResponse(
+            value=utils.get_random_value(), 
+            pid=pid, 
+            timestamp=utils.get_dt()
+        )
+    )
+    
+    return {'msg': f'Started on PID: {pid}'}
+
 
 @router.post('/create', 
              tags=['processes'], 
@@ -60,39 +85,27 @@ def get_all_processes():
 
 @router.get('/active', tags=['processes'])
 def get_all_active_processes():
-    proc = multiprocessing.active_children()
-    arr = [p.pid for p in proc]
+    arr = utils.get_active_processes()
     return {'active': arr}
 
 
 @router.get('/kill', tags=['processes'])
 def kill_the_most_recent_process():
-    background_process.terminate()
-    return 'killed:' + str(background_process.pid)
-
-@router.get('/kill_recent', tags=['processes'])
-def kill_most_recent_process():
-    try:
-        recent_process = process_history[-1]
-    except IndexError:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f'No process created!')
+    if background_process.is_alive():
+        background_process.kill()
+        s = 'Killed: {}'.format(background_process)
+        return models.MessageResponse(msg=s, timestamp=utils.get_dt())
     else:
-        print('Deleting:', recent_process)
-        return 'killed:' + str(recent_process.pid)
+        s = 'Process: {} is not alive!'
+        return models.MessageResponse(msg=s.format(background_process.pid), 
+                                     timestamp=utils.get_dt())
 
 
 @router.get('/kill_all', tags=['processes'])
 def kill_all_active_processes():
-    proc = multiprocessing.active_children()
-    for p in proc: p.terminate()
-    return {'msg': 'killed all'}
-
-
-# @router.post('/test')
-# def test(request: Request):
-#     token = request.headers.get('Authorization')
-#     if token == 123:
-#         return 'Workign!'
-#     else:
-#         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=f'Bad auth {token}')
-
+    processes = utils.get_active_processes(proc=True)
+    strings = []
+    for process in processes:
+        process.kill()
+        strings.append(f'Killed: {str(process)}')
+    return models.MultiMessageResponse(msgs=strings, timestamp=utils.get_dt())

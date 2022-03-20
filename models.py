@@ -1,5 +1,5 @@
-from pydantic import BaseModel
 from typing import List
+from pydantic import BaseModel
 
 
 class IndexResponse(BaseModel):
@@ -17,3 +17,10 @@ class ProcessesResponse(BaseModel):
     pid: int
     timestamp: str
 
+class MessageResponse(BaseModel):
+    msg: str
+    timestamp: str
+
+class MultiMessageResponse(BaseModel):
+    msgs: List[str]
+    timestamp: str
