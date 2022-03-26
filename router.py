@@ -1,4 +1,5 @@
 # Custom scripts
+from turtle import back
 import utils
 import models
 # Built-ins
@@ -91,7 +92,10 @@ def get_all_active_processes():
 
 @router.get('/kill', tags=['processes'])
 def kill_the_most_recent_process():
-    if background_process.is_alive():
+    if not background_process:
+        s = 'No process has been created!'
+        return models.MessageResponse(msg=s, timestamp=utils.get_dt())
+    elif background_process.is_alive():
         background_process.kill()
         s = 'Killed: {}'.format(background_process)
         return models.MessageResponse(msg=s, timestamp=utils.get_dt())
