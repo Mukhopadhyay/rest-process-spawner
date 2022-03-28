@@ -6,6 +6,13 @@ The server is written in [FastAPI](https://fastapi.tiangolo.com/). But the idea 
 
 Note: I was stuck for some case like this some time back, so putting it up on my page, in case anyone finds this helpful :D
 
+## Usage
+Consider the scenario, where you need to run some method, which you know will take a long time to run, but you have nothing to do with its response / return. All you want to do is to run the method and be over with it.
+This project is a boilerplate of how that can be dealt with using a rest API and a process based approach.
+
+
+
+
 ## Installing the dependencies
 ```bash
 python -m pip install -r requirements.txt
