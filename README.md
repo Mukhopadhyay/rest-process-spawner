@@ -30,6 +30,10 @@ python -m pip install -r requirements.txt
 uvicorn app:app
 ```
 
+<img src="./docs/swagger.png" width="800px">
+
+<small><i>Image: Endpoints in the application</i></small>
+
 As the server is running visit [`localhost:8000/docs`](http://localhost:8000/docs) to check out the endpoints.
 
 |Endpoint|Method|Description|

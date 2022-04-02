@@ -26,7 +26,7 @@ def get_index():
     )
 
 @router.get('/create',
-            tags=['processes'],
+            tags=['create'],
             status_code=status.HTTP_201_CREATED,
             response_model=models.CreateResponse)
 def create_with_random_val():
@@ -52,7 +52,7 @@ def create_with_random_val():
 
 
 @router.post('/create', 
-             tags=['processes'], 
+             tags=['create'], 
              status_code=status.HTTP_201_CREATED,
              response_model=models.CreateResponse)
 def create(body: models.CreateRequestBody,):
@@ -78,19 +78,19 @@ def create(body: models.CreateRequestBody,):
 
 
 @router.get('/processes', 
-            tags=['processes'], 
+            tags=['manage'], 
             response_model=List[models.ProcessesResponse])
 def get_all_processes():
     return process_history
 
 
-@router.get('/active', tags=['processes'])
+@router.get('/active', tags=['manage'])
 def get_all_active_processes():
     arr = utils.get_active_processes()
     return {'active': arr}
 
 
-@router.get('/kill', tags=['processes'])
+@router.get('/kill', tags=['manage'])
 def kill_the_most_recent_process():
     if not background_process:
         s = 'No process has been created!'
@@ -105,7 +105,7 @@ def kill_the_most_recent_process():
                                      timestamp=utils.get_dt())
 
 
-@router.get('/kill_all', tags=['processes'])
+@router.get('/kill_all', tags=['manage'])
 def kill_all_active_processes():
     processes = utils.get_active_processes(proc=True)
     strings = []
